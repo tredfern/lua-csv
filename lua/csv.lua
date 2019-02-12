@@ -55,7 +55,7 @@ function column_map:new(columns)
         names = { normalise_string(v.name) }
       elseif v.names then
         names = v.names
-        for i, n in ipairs(names) do names[i] = normalise_string(n) end
+        for i, name in ipairs(names) do names[i] = normalise_string(name) end
       end
     else
       if type(v) == "function" then
@@ -73,8 +73,8 @@ function column_map:new(columns)
     end
 
     t.name = n
-    for _, n in ipairs(names) do
-      name_map[n:lower()] = t
+    for _, name in ipairs(names) do
+      name_map[name:lower()] = t
     end
   end
 
@@ -119,7 +119,7 @@ function column_map:read_header(header)
   -- If any columns are missing, assemble an error message
   if next(not_found) then
     local problems = {}
-    for k, v in pairs(not_found) do
+    for _, v in pairs(not_found) do
       local missing
       if #v == 1 then
         missing = "'"..v[1].."'"
@@ -261,7 +261,7 @@ end
 
 
 --- If the user hasn't specified a separator, try to work out what it is.
-function guess_separator(buffer, f)
+local function guess_separator(buffer, f)
   local best_separator, lowest_diff = "", math.huge
   for _, s in ipairs(separator_candidates) do
     local ok, diff = pcall(function() return try_separator(buffer, s, f) end)
@@ -374,7 +374,7 @@ local function separated_values_iterator(buffer, parameters)
       advance(1)
       local current_pos = 0
       repeat
-        local a, b, c = field_find('"("?)', current_pos + 1)
+        local _, b, c = field_find('"("?)', current_pos + 1)
         current_pos = b
       until c ~= '"'
       if not current_pos then problem("unmatched quote") end
@@ -438,7 +438,7 @@ local function separated_values_iterator(buffer, parameters)
           end
         end
       end
-      field_count, fields, starts, nonblanks = 0, {}, {}
+      field_count, fields, starts, nonblanks = 0, {}, {}, nil
     end
 
     -- If we *really* didn't find a separator then we're done.
